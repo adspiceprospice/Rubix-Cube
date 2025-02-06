@@ -7,48 +7,200 @@
       body {
         margin: 0;
         overflow: hidden;
+        font-family: 'Arial', sans-serif;
+        transition: background-color 0.3s ease;
       }
       canvas {
         display: block;
       }
       #controls {
         position: absolute;
-        top: 10px;
-        left: 10px;
+        top: 50%;
+        left: 20px;
+        transform: translateY(-50%);
         z-index: 100;
-        background: rgba(255, 255, 255, 0.8);
-        padding: 5px;
-        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 300px;
       }
-      #controls button {
-        margin: 2px;
+      .control-section {
+        margin-bottom: 20px;
+      }
+      .section-title {
         font-size: 14px;
+        color: #666;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .move-buttons {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 5px;
+        margin-bottom: 15px;
+      }
+      button {
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: #f0f0f0;
+        color: #333;
+      }
+      button:hover {
+        background: #e0e0e0;
+        transform: translateY(-2px);
+      }
+      button:active {
+        transform: translateY(0px);
+      }
+      .action-button {
+        width: 100%;
+        padding: 12px;
+        margin: 5px 0;
+        font-weight: bold;
+        color: white;
+      }
+      #scramble {
+        background: #4CAF50;
+      }
+      #unscramble {
+        background: #2196F3;
+      }
+      #reset {
+        background: #f44336;
+      }
+      #stats {
+        display: flex;
+        justify-content: space-between;
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+      }
+      .stat-item {
+        text-align: center;
+      }
+      .stat-value {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+      }
+      .stat-label {
+        font-size: 12px;
+        color: #666;
+      }
+      #move-history {
+        max-height: 100px;
+        overflow-y: auto;
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 8px;
+        font-family: monospace;
+      }
+      .keyboard-hint {
+        font-size: 10px;
+        color: #999;
+        text-align: right;
+        margin-top: 2px;
+      }
+      .move-sequence {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+      .move-tag {
+        background: #e9ecef;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 12px;
+      }
+      .color-buttons {
+        display: flex;
+        gap: 5px;
+        margin-top: 10px;
+      }
+      
+      .color-button {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        cursor: pointer;
+        transition: transform 0.2s ease;
+      }
+      
+      .color-button:hover {
+        transform: scale(1.1);
+      }
+      
+      .color-button.active {
+        border: 2px solid #333;
       }
     </style>
   </head>
   <body>
     <div id="controls">
-      <div>
-        <button id="U">U</button>
-        <button id="Up">U′</button>
-        <button id="D">D</button>
-        <button id="Dp">D′</button>
+      <div class="control-section">
+        <div id="stats">
+          <div class="stat-item">
+            <div class="stat-value" id="move-count">0</div>
+            <div class="stat-label">Moves</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="timer">0:00</div>
+            <div class="stat-label">Time</div>
+          </div>
+        </div>
       </div>
-      <div>
-        <button id="L">L</button>
-        <button id="Lp">L′</button>
-        <button id="R">R</button>
-        <button id="Rp">R′</button>
+
+      <div class="control-section">
+        <div class="section-title">Basic Moves</div>
+        <div class="move-buttons">
+          <button id="U">U<div class="keyboard-hint">Q</div></button>
+          <button id="Up">U′<div class="keyboard-hint">Shift+Q</div></button>
+          <button id="D">D<div class="keyboard-hint">E</div></button>
+          <button id="Dp">D′<div class="keyboard-hint">Shift+E</div></button>
+          <button id="L">L<div class="keyboard-hint">A</div></button>
+          <button id="Lp">L′<div class="keyboard-hint">Shift+A</div></button>
+          <button id="R">R<div class="keyboard-hint">D</div></button>
+          <button id="Rp">R′<div class="keyboard-hint">Shift+D</div></button>
+          <button id="F">F<div class="keyboard-hint">S</div></button>
+          <button id="Fp">F′<div class="keyboard-hint">Shift+S</div></button>
+          <button id="B">B<div class="keyboard-hint">W</div></button>
+          <button id="Bp">B′<div class="keyboard-hint">Shift+W</div></button>
+        </div>
       </div>
-      <div>
-        <button id="F">F</button>
-        <button id="Fp">F′</button>
-        <button id="B">B</button>
-        <button id="Bp">B′</button>
+
+      <div class="control-section">
+        <div class="section-title">Background</div>
+        <div class="color-buttons">
+          <div class="color-button" style="background: #cccccc" data-color="#cccccc"></div>
+          <div class="color-button" style="background: #1a1a1a" data-color="#1a1a1a"></div>
+          <div class="color-button" style="background: #2c3e50" data-color="#2c3e50"></div>
+          <div class="color-button" style="background: #2ecc71" data-color="#2ecc71"></div>
+          <div class="color-button" style="background: #3498db" data-color="#3498db"></div>
+          <div class="color-button" style="background: #e74c3c" data-color="#e74c3c"></div>
+        </div>
       </div>
-      <div>
-        <button id="scramble">Scramble</button>
-        <button id="unscramble">Unscramble</button>
+
+      <div class="control-section">
+        <div class="section-title">Actions</div>
+        <button id="scramble" class="action-button">Scramble</button>
+        <button id="unscramble" class="action-button">Solve</button>
+        <button id="reset" class="action-button">Reset</button>
+      </div>
+
+      <div class="control-section">
+        <div class="section-title">Move History</div>
+        <div id="move-history">
+          <div class="move-sequence"></div>
+        </div>
       </div>
     </div>
 
@@ -322,16 +474,92 @@
         return move.endsWith("'") ? move.charAt(0) : move + "'";
       }
 
-      // === Button Event Handlers ===
+      // === Enhanced Button Event Handlers ===
       function addButtonListeners() {
-        // Helper to add a click listener if not animating (and record the move)
+        let startTime = null;
+        let timerInterval = null;
+        let moveCount = 0;
+        let isAutoMove = false;  // Flag to track automatic moves
+        let hasStarted = false;  // Flag to track if solving has started
+
+        // Update timer display
+        function updateTimer() {
+          if (!startTime) {
+            document.getElementById('timer').textContent = '0:00';
+            return;
+          }
+          const elapsed = Math.floor((Date.now() - startTime) / 1000);
+          const minutes = Math.floor(elapsed / 60);
+          const seconds = elapsed % 60;
+          document.getElementById('timer').textContent = 
+            `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Start timer on first move
+        function startTimerIfNeeded() {
+          if (!hasStarted && !isAutoMove) {
+            hasStarted = true;
+            startTime = Date.now();
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+          }
+        }
+
+        // Update move history
+        function updateMoveHistory(move) {
+          if (isAutoMove) return; // Skip if it's an automatic move
+          
+          startTimerIfNeeded(); // Start timer on first non-auto move
+          
+          const moveSequence = document.querySelector('.move-sequence');
+          const moveTag = document.createElement('span');
+          moveTag.className = 'move-tag';
+          moveTag.textContent = move;
+          moveSequence.appendChild(moveTag);
+          moveSequence.scrollTop = moveSequence.scrollHeight;
+          
+          // Update move counter
+          moveCount++;
+          document.getElementById('move-count').textContent = moveCount;
+        }
+
+        // Helper to add a click listener with visual feedback
         function addMove(buttonId, moveStr) {
-          document.getElementById(buttonId).addEventListener("click", () => {
+          const button = document.getElementById(buttonId);
+          button.addEventListener("click", () => {
             if (isAnimating) return;
+            
+            // Visual feedback
+            button.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+              button.style.transform = '';
+            }, 100);
+
             moveHistory.push(moveStr);
+            updateMoveHistory(moveStr);
             animateMove(moveStr);
           });
         }
+
+        // Add keyboard controls
+        const keyMappings = {
+          'q': 'U', 'Q': 'Up',
+          'e': 'D', 'E': 'Dp',
+          'a': 'L', 'A': 'Lp',
+          'd': 'R', 'D': 'Rp',
+          's': 'F', 'S': 'Fp',
+          'w': 'B', 'W': 'Bp'
+        };
+
+        document.addEventListener('keydown', (event) => {
+          const move = keyMappings[event.key];
+          if (move && !isAnimating) {
+            const button = document.getElementById(move);
+            if (button) button.click();
+          }
+        });
+
+        // Add basic move listeners
         addMove("U", "U");
         addMove("Up", "U'");
         addMove("D", "D");
@@ -345,14 +573,27 @@
         addMove("B", "B");
         addMove("Bp", "B'");
 
-        // Scramble button: perform a sequence of random moves.
+        // Enhanced scramble button
         document.getElementById("scramble").addEventListener("click", () => {
           if (isAnimating) return;
           const scrambleCount = 20;
           const moves = ["U", "U'", "D", "D'", "L", "L'", "R", "R'", "F", "F'", "B", "B'"];
           let i = 0;
+          
+          // Reset timer and move count when scrambling
+          startTime = null;
+          hasStarted = false;
+          moveCount = 0;
+          document.getElementById('move-count').textContent = '0';
+          document.getElementById('timer').textContent = '0:00';
+          if (timerInterval) clearInterval(timerInterval);
+          
+          isAutoMove = true; // Set flag for automatic moves
           function doScramble() {
-            if (i >= scrambleCount) return;
+            if (i >= scrambleCount) {
+              isAutoMove = false; // Reset flag when done
+              return;
+            }
             const move = moves[Math.floor(Math.random() * moves.length)];
             moveHistory.push(move);
             animateMove(move, () => {
@@ -363,7 +604,7 @@
           doScramble();
         });
 
-        // Unscramble button: every 500 ms, apply the inverse of the last move until solved.
+        // Enhanced unscramble button
         document.getElementById("unscramble").addEventListener("click", () => {
           const interval = setInterval(() => {
             if (isAnimating) return;
@@ -373,9 +614,53 @@
             }
             const lastMove = moveHistory.pop();
             const inverse = getInverse(lastMove);
+            updateMoveHistory(inverse);
             animateMove(inverse);
           }, 500);
         });
+
+        // Add reset button
+        document.getElementById("reset").addEventListener("click", () => {
+          if (isAnimating) return;
+          // Reset timer
+          startTime = null;
+          hasStarted = false;
+          if (timerInterval) clearInterval(timerInterval);
+          document.getElementById('timer').textContent = '0:00';
+          
+          moveCount = 0;
+          document.getElementById('move-count').textContent = '0';
+          
+          // Clear move history
+          document.querySelector('.move-sequence').innerHTML = '';
+          moveHistory = [];
+          
+          // Reset cube position
+          cubies.forEach((cubie) => {
+            cubie.position.copy(cubie.userData.solvedPosition);
+            cubie.quaternion.copy(cubie.userData.solvedQuaternion);
+          });
+        });
+
+        // Add background color controls
+        const colorButtons = document.querySelectorAll('.color-button');
+        colorButtons.forEach(button => {
+          button.addEventListener('click', () => {
+            // Remove active class from all buttons
+            colorButtons.forEach(btn => btn.classList.remove('active'));
+            // Add active class to clicked button
+            button.classList.add('active');
+            // Update background color
+            const color = button.getAttribute('data-color');
+            scene.background = new THREE.Color(color);
+          });
+        });
+        
+        // Set initial active color
+        colorButtons[0].classList.add('active');
+
+        // Initialize timer display
+        updateTimer();
       }
 
       // === Start Everything ===
