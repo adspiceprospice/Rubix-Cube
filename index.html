@@ -9,7 +9,13 @@
         overflow: hidden;
         font-family: 'Arial', sans-serif;
         transition: background-color 0.3s ease;
+        background: #cccccc;
       }
+      
+      body.gradient {
+        background: linear-gradient(var(--gradient-angle), var(--gradient-start), var(--gradient-end));
+      }
+
       canvas {
         display: block;
       }
@@ -133,6 +139,11 @@
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         cursor: pointer;
         transition: transform 0.2s ease;
+        background: #cccccc;
+      }
+      
+      .color-button.gradient {
+        background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
       }
       
       .color-button:hover {
@@ -183,9 +194,11 @@
           <div class="color-button" style="background: #cccccc" data-color="#cccccc"></div>
           <div class="color-button" style="background: #1a1a1a" data-color="#1a1a1a"></div>
           <div class="color-button" style="background: #2c3e50" data-color="#2c3e50"></div>
-          <div class="color-button" style="background: #2ecc71" data-color="#2ecc71"></div>
+          <div class="color-button gradient" style="--gradient-start: #2193b0; --gradient-end: #6dd5ed; --gradient-angle: 135deg;" 
+               data-gradient-start="#2193b0" data-gradient-end="#6dd5ed" data-gradient-angle="135deg"></div>
           <div class="color-button" style="background: #3498db" data-color="#3498db"></div>
-          <div class="color-button" style="background: #e74c3c" data-color="#e74c3c"></div>
+          <div class="color-button gradient" style="--gradient-start: #834d9b; --gradient-end: #d04ed6; --gradient-angle: 45deg;" 
+               data-gradient-start="#834d9b" data-gradient-end="#d04ed6" data-gradient-angle="45deg"></div>
         </div>
       </div>
 
@@ -650,14 +663,52 @@
             colorButtons.forEach(btn => btn.classList.remove('active'));
             // Add active class to clicked button
             button.classList.add('active');
-            // Update background color
-            const color = button.getAttribute('data-color');
-            scene.background = new THREE.Color(color);
+            
+            if (button.hasAttribute('data-gradient-start')) {
+              // Set gradient background on body
+              document.body.classList.add('gradient');
+              document.body.style.setProperty('--gradient-start', button.getAttribute('data-gradient-start'));
+              document.body.style.setProperty('--gradient-end', button.getAttribute('data-gradient-end'));
+              document.body.style.setProperty('--gradient-angle', button.getAttribute('data-gradient-angle'));
+              
+              // Create matching gradient texture for scene background
+              const canvas = document.createElement('canvas');
+              canvas.width = 512;
+              canvas.height = 512;
+              const ctx = canvas.getContext('2d');
+              
+              // Convert angle to radians and calculate gradient coordinates
+              const angleInDeg = parseInt(button.getAttribute('data-gradient-angle'));
+              const angleInRad = (angleInDeg - 90) * Math.PI / 180;
+              const gradientLength = Math.sqrt(2) * 512; // diagonal length of canvas
+              const centerX = canvas.width / 2;
+              const centerY = canvas.height / 2;
+              const startX = centerX - Math.cos(angleInRad) * gradientLength / 2;
+              const startY = centerY - Math.sin(angleInRad) * gradientLength / 2;
+              const endX = centerX + Math.cos(angleInRad) * gradientLength / 2;
+              const endY = centerY + Math.sin(angleInRad) * gradientLength / 2;
+              
+              const gradient = ctx.createLinearGradient(startX, startY, endX, endY);
+              gradient.addColorStop(0, button.getAttribute('data-gradient-start'));
+              gradient.addColorStop(1, button.getAttribute('data-gradient-end'));
+              ctx.fillStyle = gradient;
+              ctx.fillRect(0, 0, 512, 512);
+              
+              const texture = new THREE.CanvasTexture(canvas);
+              scene.background = texture;
+            } else {
+              // Single color background
+              document.body.classList.remove('gradient');
+              document.body.style.background = button.getAttribute('data-color');
+              scene.background = new THREE.Color(button.getAttribute('data-color'));
+            }
           });
         });
         
-        // Set initial active color
-        colorButtons[0].classList.add('active');
+        // Set initial active color and background
+        const initialButton = colorButtons[0];
+        initialButton.classList.add('active');
+        document.body.style.background = initialButton.getAttribute('data-color');
 
         // Initialize timer display
         updateTimer();
